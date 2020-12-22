@@ -12,6 +12,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/:id', async (req, res) => {
+  console.log('get ------->', req.params.id);
+  try {
+    const task = await taskModel.findById(req.params.id);
+    res.status(200).json(task);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 router.post('/', async (req, res) => {
   console.log('add ------->', req.body);
   const newTask = new taskModel({ title: req.body.title });

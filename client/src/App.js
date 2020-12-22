@@ -8,13 +8,19 @@ function App() {
   }
 
   const getTasks = () => {
-    fetch('/tasks')
+    fetch('/api/tasks')
       .then(response => response.json())
       .then(result => { taksList = result; console.log('x2', result); });
   }
 
+  const getTask = () => {
+    fetch('/api/tasks/' + taksList[0]._id)
+      .then(response => response.json())
+      .then(result => console.log('x2', result));
+  }
+
   const addTask = () => {
-    fetch('/tasks', {
+    fetch('/api/tasks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json;charset=utf-8'
@@ -26,22 +32,16 @@ function App() {
   }
 
   const updateTask = () => {
-    fetch('/tasks/' + taksList[0]._id, {
+    fetch('/api/tasks/' + taksList[0]._id, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8'
-      },
     })
       .then(response => response.json())
       .then(result => console.log('x3', result));
   }
 
   const deleteTask = () => {
-    fetch('/tasks/' + taksList[0]._id, {
+    fetch('/api/tasks/' + taksList[0]._id, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8'
-      },
     })
       .then(response => response.json())
       .then(result => console.log('x3', result));
@@ -51,6 +51,7 @@ function App() {
     <div className="App">
       <button onClick={getCommon}>getCommon</button><br/>
       <button onClick={getTasks}>getTasks</button><br/>
+      <button onClick={getTask}>getTask</button><br/>
       <button onClick={addTask}>addTask</button><br/>
       <button onClick={updateTask}>updateTask</button><br/>
       <button onClick={deleteTask}>deleteTask</button><br/>

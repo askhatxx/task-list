@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,10 +10,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/tasks', tasksRoutes);
+app.use('/api/tasks', tasksRoutes);
 
-app.get('/', (req, res) => {
-  res.json({ test:"Hello!!!" });
+const clientDir = path.join(__dirname, '..', 'client', 'build');
+
+app.use('/', express.static(clientDir));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDir, 'index.html'));
 });
 
 const CONNECTION_URL = 'mongodb+srv://user01:user01@cluster0.ty15q.mongodb.net/tasks';
