@@ -1,3 +1,5 @@
+import { BrowserRouter, Switch, Route, Link, useParams } from 'react-router-dom';
+
 function App() {
   let taksList = [];
 
@@ -48,15 +50,51 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <BrowserRouter>
       <button onClick={getCommon}>getCommon</button><br/>
       <button onClick={getTasks}>getTasks</button><br/>
       <button onClick={getTask}>getTask</button><br/>
       <button onClick={addTask}>addTask</button><br/>
       <button onClick={updateTask}>updateTask</button><br/>
       <button onClick={deleteTask}>deleteTask</button><br/>
-    </div>
+      <div>
+        <Switch>
+          <Route path='/' component={Home} exact/>
+          <Route path='/:id' component={Task} exact/>
+          <Route component={Page404}/>
+        </Switch>
+      </div>
+    </BrowserRouter>
   );
 }
 
 export default App;
+
+function Home() {
+  return (
+    <div>
+      <Link to='/1234'>Task 1234</Link>
+      <h2>Home</h2>
+    </div>
+  );
+}
+
+function Task() {
+  let { id } = useParams();
+  console.log('id', id);
+  return (
+    <div>
+      <Link to='/'>Home</Link>
+      <h2>Task id: {id}</h2>
+    </div>
+  );
+}
+
+function Page404() {
+  return (
+    <div>
+      <Link to='/'>Home</Link>
+      <h2>404</h2>
+    </div>
+  );
+}
