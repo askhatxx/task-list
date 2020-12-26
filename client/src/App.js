@@ -1,52 +1,38 @@
 import { BrowserRouter, Switch, Route, Link, useParams } from 'react-router-dom';
+import api from './api';
 
 function App() {
   let taksList = [];
 
-  const getCommon = () => {
-    fetch('http://localhost:5000')
-      .then(response => response.json())
-      .then(result => console.log('x1', result));
+  const getCommon = async () => {
+    const result = await api.getCommon();
+    console.log('getCommon', result);
   }
 
-  const getTasks = () => {
-    fetch('/api/tasks')
-      .then(response => response.json())
-      .then(result => { taksList = result; console.log('x2', result); });
+  const getTasks = async () => {
+    const result = await api.getTasks();
+    console.log('getTasks', result);
+    taksList = result;
   }
 
-  const getTask = () => {
-    fetch('/api/tasks/' + taksList[0]._id)
-      .then(response => response.json())
-      .then(result => console.log('x2', result));
+  const getTask = async () => {
+    const result = await api.getTask(taksList[0]._id);
+    console.log('getTask', result);
   }
 
-  const addTask = () => {
-    fetch('/api/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8'
-      },
-      body: JSON.stringify({ title: 'title from front 1' })
-    })
-      .then(response => response.json())
-      .then(result => console.log('x3', result));
+  const addTask = async () => {
+    const result = await api.addTask({ title: 'title from front 1' });
+    console.log('addTask', result);
   }
 
-  const updateTask = () => {
-    fetch('/api/tasks/' + taksList[0]._id, {
-      method: 'PUT',
-    })
-      .then(response => response.json())
-      .then(result => console.log('x3', result));
+  const updateTask = async () => {
+    const result = await api.updateTask(taksList[0]._id);
+    console.log('updateTask', result);
   }
 
-  const deleteTask = () => {
-    fetch('/api/tasks/' + taksList[0]._id, {
-      method: 'DELETE',
-    })
-      .then(response => response.json())
-      .then(result => console.log('x3', result));
+  const deleteTask = async () => {
+    const result = await api.deleteTask(taksList[0]._id);
+    console.log('deleteTask', result);
   }
 
   return (
