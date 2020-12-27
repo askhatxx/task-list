@@ -1,77 +1,111 @@
-import { BrowserRouter, Switch, Route, Link, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Switch, Route, Link, useParams, useRouteMatch, useHistory } from 'react-router-dom';
 import api from './api';
 
 function App() {
-  let taksList = [];
-
-  const getCommon = async () => {
-    const result = await api.getCommon();
-    console.log('getCommon', result);
-  }
-
-  const getTasks = async () => {
-    const result = await api.getTasks();
-    console.log('getTasks', result);
-    taksList = result;
-  }
-
-  const getTask = async () => {
-    const result = await api.getTask(taksList[0]._id);
-    console.log('getTask', result);
-  }
-
-  const addTask = async () => {
-    const result = await api.addTask({ title: 'title from front 1' });
-    console.log('addTask', result);
-  }
-
-  const updateTask = async () => {
-    const result = await api.updateTask(taksList[0]._id);
-    console.log('updateTask', result);
-  }
-
-  const deleteTask = async () => {
-    const result = await api.deleteTask(taksList[0]._id);
-    console.log('deleteTask', result);
-  }
-
   return (
-    <BrowserRouter>
-      <button onClick={getCommon}>getCommon</button><br/>
-      <button onClick={getTasks}>getTasks</button><br/>
-      <button onClick={getTask}>getTask</button><br/>
-      <button onClick={addTask}>addTask</button><br/>
-      <button onClick={updateTask}>updateTask</button><br/>
-      <button onClick={deleteTask}>deleteTask</button><br/>
-      <div>
+    <div className='container'>
+      <BrowserRouter>
         <Switch>
-          <Route path='/' component={Home} exact/>
-          <Route path='/:id' component={Task} exact/>
-          <Route component={Page404}/>
+          <Route path='/' exact>
+            <PageHome/>
+          </Route>
+          <Route path='/:id' exact>
+            <PageTask/>
+          </Route>
+          <Route>
+            <Page404/>
+          </Route>
         </Switch>
-      </div>
-    </BrowserRouter>
-  );
-}
-
-export default App;
-
-function Home() {
-  return (
-    <div>
-      <Link to='/1234'>Task 1234</Link>
-      <h2>Home</h2>
+      </BrowserRouter>
     </div>
   );
 }
 
-function Task() {
-  let { id } = useParams();
-  console.log('id', id);
+function PageHome() {
+  const [tasks, setTasks] = useState([]);
+
+  const getTasks = async () => {
+    const result = await api.getTasks();
+    console.log('App getTasks', result);
+    setTasks(result);
+  }
+
+  useEffect(() => {
+    console.log('App useEffect');
+    getTasks();
+  }, []);
+
+  const addTask = async () => {
+    const result = await api.addTask({ title: 'title from front 3' });
+    console.log('PageHome addTask', result);
+    getTasks();
+  }
+
+  return (
+    <div>
+      <button onClick={addTask}>addTask</button><br/><br/><br/>
+      <div className='row'>
+        { tasks.map(item => <Task key={item._id} task={item} refresh={getTasks}/>) }
+      </div>
+    </div>
+  );
+}
+
+function Task({ task, refresh }) {
+  const { url } = useRouteMatch();
+  const history = useHistory();
+  const [loading, setLoading] = useState(false);
+
+  const updateTask = async () => {
+    setLoading(true);
+    const result = await api.updateTask({ id: task._id, completed: !task.completed });
+    console.log('TaskElement updateTask', result);
+    refresh();
+    setLoading(false);
+  }
+
+  const deleteTask = async () => {
+    setLoading(true);
+    const result = await api.deleteTask(task._id);
+    console.log('TaskElement deleteTask', result);
+    setLoading(false);
+    url === '/' ? refresh() : history.push('/');
+  }
+
+  return (
+    <div className='col-md-6 col-lg-4'>
+      <div className='task'>
+        { task.title }<br/>
+        <div className="form-check form-switch">
+          <input className="form-check-input" type="checkbox" checked={task.completed} onChange={updateTask} disabled={loading}/>
+        </div>
+        <button className='btn btn-info' onClick={deleteTask} disabled={loading}><i className="far fa-trash-alt"/></button><br/>
+        { url === '/' && <Link to={'/' + task._id} className='btn btn-info'><i className="far fa-eye"/></Link> }
+      </div>
+    </div>
+  );
+}
+
+function PageTask() {
+  const { id } = useParams();
+  const [task, setTask] = useState(null);
+
+  const getTask = async (id) => {
+    const result = await api.getTask(id);
+    setTask(result);
+    console.log('PageTask getTask', result);
+  }
+
+  useEffect(() => {
+    console.log('PageTask useEffect');
+    getTask(id);
+  }, [id]);
+  
   return (
     <div>
       <Link to='/'>Home</Link>
-      <h2>Task id: {id}</h2>
+      { task && <Task task={task} refresh={() => getTask(id)}/> }
     </div>
   );
 }
@@ -84,3 +118,5 @@ function Page404() {
     </div>
   );
 }
+
+export default App;

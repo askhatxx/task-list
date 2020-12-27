@@ -1,9 +1,4 @@
 const api = {
-  getCommon: async () => {
-    const response = await fetch('http://localhost:5000');
-    return await response.json();
-  },
-
   getTasks: async () => {
     const response = await fetch('/api/tasks');
     return await response.json();
@@ -17,17 +12,21 @@ const api = {
   addTask: async (newTask) => {
     const response = await fetch('/api/tasks', {
       method: 'POST',
+      body: JSON.stringify(newTask),
       headers: {
         'Content-Type': 'application/json;charset=utf-8'
-      },
-      body: JSON.stringify(newTask)
+      }
     });
     return await response.json();
   },
 
-  updateTask: async (id) => {
+  updateTask: async ({ id, completed }) => {
     const response = await fetch('/api/tasks/' + id, {
       method: 'PUT',
+      body: JSON.stringify({ completed }),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      }
     });
     return await response.json();
   },

@@ -35,10 +35,9 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  console.log('put ------->', req.params.id);
+  console.log('put ------->', req.params.id, req.body);
   try {
-    const task = await taskModel.findById(req.params.id);
-    await taskModel.findByIdAndUpdate(req.params.id, { completed: !task.completed });
+    await taskModel.findByIdAndUpdate(req.params.id, { completed: req.body.completed });
     res.status(201).json({ message: 'Task updated successfully ' + req.params.id });
   } catch (error) {
     res.status(404).json({ message: error.message });
