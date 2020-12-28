@@ -24,6 +24,7 @@ function App() {
 
 function PageHome() {
   const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState('');
 
   const getTasks = async () => {
     const result = await api.getTasks();
@@ -37,14 +38,21 @@ function PageHome() {
   }, []);
 
   const addTask = async () => {
-    const result = await api.addTask({ title: 'title from front 3' });
+    if (!newTask.trim()) return;
+    const result = await api.addTask({ title: newTask.trim() });
     console.log('PageHome addTask', result);
     getTasks();
   }
 
   return (
     <div>
-      <button onClick={addTask}>addTask</button><br/><br/><br/>
+      <div className='add-task'>
+        <input className='task-input'
+          value={newTask} 
+          onChange={e => setNewTask(e.target.value)}
+          placeholder='Enter task...'/>
+        <button className='task__btn task__btn_lg' onClick={addTask}><i className="fas fa-paper-plane"/></button>
+      </div>
       <div className='row'>
         { tasks.map(item => <Task key={item._id} task={item} refresh={getTasks}/>) }
       </div>
@@ -75,13 +83,21 @@ function Task({ task, refresh }) {
 
   return (
     <div className='col-md-6 col-lg-4'>
-      <div className='task'>
-        { task.title }<br/>
-        <div className="form-check form-switch">
-          <input className="form-check-input" type="checkbox" checked={task.completed} onChange={updateTask} disabled={loading}/>
+      <div className='padding-task'>
+        <div className='task'>
+          <div className='task__title'>
+            { task.title }
+          </div>
+          <div className='task__options'>
+            <div className="form-check form-switch">
+              <input className="form-check-input task__checkbox" type="checkbox" checked={task.completed} onChange={updateTask} disabled={loading}/>
+            </div>
+            <div className='task__btn-group'>
+              <button className='task__btn' onClick={deleteTask}><i className="far fa-trash-alt"/></button>
+              { url === '/' && <Link to={'/' + task._id} className='task__btn'><i className="far fa-eye"/></Link> }
+            </div>
+          </div>
         </div>
-        <button className='btn btn-info' onClick={deleteTask} disabled={loading}><i className="far fa-trash-alt"/></button><br/>
-        { url === '/' && <Link to={'/' + task._id} className='btn btn-info'><i className="far fa-eye"/></Link> }
       </div>
     </div>
   );
