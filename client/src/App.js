@@ -39,9 +39,9 @@ function PageHome() {
 
   const addTask = async () => {
     if (!newTask.trim()) return;
-    const result = await api.addTask({ title: newTask.trim() });
-    console.log('PageHome addTask', result);
-    getTasks();
+    await api.addTask({ title: newTask.trim() });
+    await getTasks();
+    setNewTask('');
   }
 
   return (
@@ -60,7 +60,7 @@ function PageHome() {
   );
 }
 
-function Task({ task, refresh }) {
+function Task({ task, refresh, fullWidth }) {
   const { url } = useRouteMatch();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
@@ -81,12 +81,33 @@ function Task({ task, refresh }) {
     url === '/' ? refresh() : history.push('/');
   }
 
+  const dateTask = () => {
+    const formatDateAddZero = num => {
+      if (num < 10) {
+          return '0' + num;
+      }
+      return num;
+    }
+
+    const date = new Date(Date.parse(task.date));
+    const day = formatDateAddZero(date.getDate());
+    const month = formatDateAddZero(date.getMonth() + 1);
+    const year = date.getFullYear();
+    const hours = formatDateAddZero(date.getHours());
+    const minutes = formatDateAddZero(date.getMinutes());
+
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
+  }
+
   return (
-    <div className='col-md-6 col-lg-4'>
+    <div className={fullWidth ? 'col' : 'col-md-6 col-lg-4'}>
       <div className='padding-task'>
         <div className='task'>
           <div className='task__title'>
             { task.title }
+          </div>
+          <div className='task__date'>
+            <i className="far fa-calendar-alt"/> { dateTask() }
           </div>
           <div className='task__options'>
             <div className="form-check form-switch">
@@ -120,8 +141,14 @@ function PageTask() {
   
   return (
     <div>
-      <Link to='/'>Home</Link>
-      { task && <Task task={task} refresh={() => getTask(id)}/> }
+      <div className='go-back'>
+        <Link to='/'className='task__btn task__btn_lg'>
+          <i className="fas fa-angle-left"/> Home
+        </Link>
+      </div>
+      <div className='row'>
+        { task && <Task task={task} refresh={() => getTask(id)} fullWidth/> }
+      </div>
     </div>
   );
 }

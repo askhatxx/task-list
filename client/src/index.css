@@ -17,6 +17,10 @@ body {
   padding: 50px 20px 30px;
 }
 
+.go-back {
+  padding: 50px 20px 10px;
+}
+
 .task-input {
   background: none;
   border: none;
@@ -50,7 +54,6 @@ body {
 .task {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   padding: 25px;
   height: 100%;
   border-radius: 12px;
@@ -60,7 +63,15 @@ body {
 .task__title {
   color: #82569C;
   font-size: 1.2rem;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  flex-grow: 1;
+  word-wrap: break-word;
+}
+
+.task__date {
+  color: #C59ADF;
+  font-size: .9rem;
+  margin-bottom: 10px;
 }
 
 .task__options {

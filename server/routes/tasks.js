@@ -6,7 +6,7 @@ const router = Router();
 router.get('/', async (req, res) => {
   console.log('get all ------->');
   try {
-    const tasks = await taskModel.find();
+    const tasks = await taskModel.find().sort({ date: 'desc' });
     res.status(200).json(tasks);
   } catch (error) {
     res.status(404).json({ message: error.message });
