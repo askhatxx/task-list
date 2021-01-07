@@ -4,7 +4,6 @@ const taskModel = require('../models/task');
 const router = Router();
 
 router.get('/', async (req, res) => {
-  console.log('get all ------->');
   try {
     const tasks = await taskModel.find().sort({ date: 'desc' });
     res.status(200).json(tasks);
@@ -14,17 +13,19 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  console.log('get ------->', req.params.id);
   try {
     const task = await taskModel.findById(req.params.id);
-    res.status(200).json(task);
+    if (task) {
+      res.status(200).json(task);
+    } else {
+      res.status(404).json({ message: 'Not Found' });
+    }
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 });
 
 router.post('/', async (req, res) => {
-  console.log('add ------->', req.body);
   const newTask = new taskModel({ title: req.body.title });
   try {
     await newTask.save();
@@ -35,7 +36,6 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  console.log('put ------->', req.params.id, req.body);
   try {
     await taskModel.findByIdAndUpdate(req.params.id, { completed: req.body.completed });
     res.status(201).json({ message: 'Task updated successfully ' + req.params.id });
@@ -45,7 +45,6 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  console.log('delete ------->', req.params.id);
   try {
     await taskModel.findByIdAndRemove(req.params.id);
     res.status(201).json({ message: 'Task deleted successfully ' + req.params.id });

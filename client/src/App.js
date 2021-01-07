@@ -28,14 +28,8 @@ function PageHome() {
 
   const getTasks = async () => {
     const result = await api.getTasks();
-    console.log('App getTasks', result);
     setTasks(result);
   }
-
-  useEffect(() => {
-    console.log('App useEffect');
-    getTasks();
-  }, []);
 
   const addTask = async () => {
     if (!newTask.trim()) return;
@@ -44,14 +38,22 @@ function PageHome() {
     setNewTask('');
   }
 
+  useEffect(() => {
+    getTasks();
+  }, []);
+
   return (
     <div>
       <div className='add-task'>
-        <input className='task-input'
+        <input
+          className='task-input'
           value={newTask} 
           onChange={e => setNewTask(e.target.value)}
-          placeholder='Enter task...'/>
-        <button className='task__btn task__btn_lg' onClick={addTask}><i className="fas fa-paper-plane"/></button>
+          placeholder='Enter task...'
+        />
+        <button className='task__btn task__btn_lg' onClick={addTask}>
+          <i className='fas fa-paper-plane'/>
+        </button>
       </div>
       <div className='row'>
         { tasks.map(item => <Task key={item._id} task={item} refresh={getTasks}/>) }
@@ -67,16 +69,14 @@ function Task({ task, refresh, fullWidth }) {
 
   const updateTask = async () => {
     setLoading(true);
-    const result = await api.updateTask({ id: task._id, completed: !task.completed });
-    console.log('TaskElement updateTask', result);
+    await api.updateTask({ id: task._id, completed: !task.completed });
     refresh();
     setLoading(false);
   }
 
   const deleteTask = async () => {
     setLoading(true);
-    const result = await api.deleteTask(task._id);
-    console.log('TaskElement deleteTask', result);
+    await api.deleteTask(task._id);
     setLoading(false);
     url === '/' ? refresh() : history.push('/');
   }
@@ -107,15 +107,23 @@ function Task({ task, refresh, fullWidth }) {
             { task.title }
           </div>
           <div className='task__date'>
-            <i className="far fa-calendar-alt"/> { dateTask() }
+            <i className='far fa-calendar-alt'/> { dateTask() }
           </div>
           <div className='task__options'>
-            <div className="form-check form-switch">
-              <input className="form-check-input task__checkbox" type="checkbox" checked={task.completed} onChange={updateTask} disabled={loading}/>
+            <div className='form-check form-switch'>
+              <input
+                className='form-check-input task__checkbox'
+                type='checkbox'
+                checked={task.completed}
+                onChange={updateTask}
+                disabled={loading}
+              />
             </div>
             <div className='task__btn-group'>
-              <button className='task__btn' onClick={deleteTask}><i className="far fa-trash-alt"/></button>
-              { url === '/' && <Link to={'/' + task._id} className='task__btn'><i className="far fa-eye"/></Link> }
+              <button className='task__btn' onClick={deleteTask}>
+                <i className='far fa-trash-alt'/>
+              </button>
+              { url === '/' && <Link to={'/' + task._id} className='task__btn'><i className='far fa-eye'/></Link> }
             </div>
           </div>
         </div>
@@ -127,15 +135,18 @@ function Task({ task, refresh, fullWidth }) {
 function PageTask() {
   const { id } = useParams();
   const [task, setTask] = useState(null);
+  const [isError, setError] = useState(false);
 
   const getTask = async (id) => {
     const result = await api.getTask(id);
-    setTask(result);
-    console.log('PageTask getTask', result);
+    if (result.error) {
+      setError(true);
+    } else {
+      setTask(result);
+    }
   }
 
   useEffect(() => {
-    console.log('PageTask useEffect');
     getTask(id);
   }, [id]);
   
@@ -143,11 +154,12 @@ function PageTask() {
     <div>
       <div className='go-back'>
         <Link to='/'className='task__btn task__btn_lg'>
-          <i className="fas fa-angle-left"/> Home
+          <i className='fas fa-angle-left'/> Home
         </Link>
       </div>
       <div className='row'>
         { task && <Task task={task} refresh={() => getTask(id)} fullWidth/> }
+        { isError && <h2 className='text-center'>Not Found</h2> }
       </div>
     </div>
   );
@@ -156,8 +168,12 @@ function PageTask() {
 function Page404() {
   return (
     <div>
-      <Link to='/'>Home</Link>
-      <h2>404</h2>
+      <div className='go-back'>
+        <Link to='/'className='task__btn task__btn_lg'>
+          <i className='fas fa-angle-left'/> Home
+        </Link>
+      </div>
+      <h2 className='text-center'>404</h2>
     </div>
   );
 }

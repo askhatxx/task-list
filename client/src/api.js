@@ -6,6 +6,9 @@ const api = {
 
   getTask: async (id) => {
     const response = await fetch('/api/tasks/' + id);
+    if (response.status === 404) {
+      return { error: true };
+    }
     return await response.json();
   },
 
